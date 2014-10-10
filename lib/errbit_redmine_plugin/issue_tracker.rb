@@ -46,6 +46,7 @@ module ErrbitRedminePlugin
 
     def url
       account = params['account']
+      project_id = params['project_id']
 
       acc_url = account.start_with?('http') ? account : "http://#{account}"
       acc_url = acc_url.gsub(/\/$/, '')
