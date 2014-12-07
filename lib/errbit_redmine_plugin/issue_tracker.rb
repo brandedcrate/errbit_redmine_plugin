@@ -27,6 +27,11 @@ module ErrbitRedminePlugin
         :optional    => true,
         :label       => "App Project",
         :placeholder => "Where app's files & revisions can be viewed. (Leave blank to use the above project by default)"
+      }],
+      [:tracker_id, {
+        :optional    => true,
+        :label       => "Issue Tracker Id",
+        :placeholder => "The tracker where tickets will be created. (Leave blank to use default)"
       }]
     ]
 
@@ -82,6 +87,7 @@ module ErrbitRedminePlugin
       user   = params['username']
       passwd = params['password']
       project_id = params['project_id']
+      tracker_id = params['tracker_id']
 
       RedmineClient::Base.configure do
         self.token = token
@@ -94,6 +100,7 @@ module ErrbitRedminePlugin
       issue = RedmineClient::Issue.new(:project_id => project_id)
       issue.subject = "[#{ problem.environment }][#{ problem.where }] #{problem.message.to_s.truncate(100)}"
       issue.description = self.class.body_template.result(binding)
+      issue.tracker_id = tracker_id if tracker_id.present?
       issue.save!
 
       problem.update_attributes(
