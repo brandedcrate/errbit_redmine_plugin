@@ -131,13 +131,5 @@ module ErrbitRedminePlugin
       RedmineClient::Issue.element_path(issue.id, :project_id => project_id)
         .sub(/\.xml\?project_id=#{project_id}$/, "\?project_id=#{project_id}")
     end
-
-    def self.body_template
-      @body_template ||= ERB.new(File.read(
-        File.join(
-          ErrbitRedminePlugin.root, 'views', 'redmine_ticket_body.txt.erb'
-        )
-      ))
-    end
   end
 end
