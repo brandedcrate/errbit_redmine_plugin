@@ -49,6 +49,20 @@ module ErrbitRedminePlugin
       FIELDS
     end
 
+    def self.icons
+      @icons ||= {
+        create: [
+          'image/png', ErrbitRedminePlugin.read_static_file('redmine_create.png')
+        ],
+        goto: [
+          'image/png', ErrbitRedminePlugin.read_static_file('redmine_goto.png'),
+        ],
+        inactive: [
+          'image/png', ErrbitRedminePlugin.read_static_file('redmine_inactive.png'),
+        ]
+      }
+    end
+
     def url
       account = params['account']
       project_id = params['project_id']
