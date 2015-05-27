@@ -1,4 +1,4 @@
-require "errbit_redmine_plugin/version"
+require 'errbit_redmine_plugin/version'
 require 'errbit_redmine_plugin/issue_tracker'
 
 module ErrbitRedminePlugin

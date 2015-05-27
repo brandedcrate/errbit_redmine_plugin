@@ -64,8 +64,8 @@ module ErrbitRedminePlugin
     end
 
     def url
-      account = params['account']
-      project_id = params['project_id']
+      account = options['account']
+      project_id = options['project_id']
 
       acc_url = account.start_with?('http') ? account : "http://#{account}"
       acc_url = acc_url.gsub(/\/$/, '')
@@ -79,8 +79,8 @@ module ErrbitRedminePlugin
 
     # configured properly if all the fields are filled in
     def configured?
-      non_empty_params = params.reject { |k,v| v.empty? }.keys.map(&:intern)
-      (required_fields - non_empty_params).empty?
+      non_empty_options = options.reject { |k,v| v.empty? }.keys.map(&:intern)
+      (required_fields - non_empty_options).empty?
     end
 
     def required_fields
@@ -95,13 +95,13 @@ module ErrbitRedminePlugin
       errors
     end
 
-    def create_issue(problem, reported_by = nil)
-      token  = params['api_token']
-      acc    = params['account']
-      user   = params['username']
-      passwd = params['password']
-      project_id = params['project_id']
-      tracker_id = params['tracker_id']
+    def create_issue(title, body, user: {})
+      token  = options['api_token']
+      acc    = options['account']
+      user   = options['username']
+      passwd = options['password']
+      project_id = options['project_id']
+      tracker_id = options['tracker_id']
 
       RedmineClient::Base.configure do
         self.token = token
@@ -112,19 +112,16 @@ module ErrbitRedminePlugin
       end
 
       issue = RedmineClient::Issue.new(:project_id => project_id)
-      issue.subject = "[#{ problem.environment }][#{ problem.where }] #{problem.message.to_s.truncate(100)}"
-      issue.description = self.class.body_template.result(binding)
+      issue.subject = title
+      issue.description = body
       issue.tracker_id = tracker_id if tracker_id.present?
       issue.save!
 
-      problem.update_attributes(
-        :issue_link => issue_link(issue),
-        :issue_type => LABEL
-      )
+      issue_link(issue)
     end
 
     def issue_link(issue)
-      project_id = params['project_id']
+      project_id = options['project_id']
 
       RedmineClient::Issue.site.to_s
         .sub(/#{RedmineClient::Issue.site.path}$/, '') <<
